@@ -1,26 +1,34 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:company/model/employee_data_request_model.dart';
 import 'package:company/model/employee_data_response_model.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/src/adapters/io_adapter.dart';
 import 'package:flutter/foundation.dart';
 
 class APIHelper {
   final dio = Dio();
+  final uri = "https://examination.24x7retail.com/api/v1.0/Employees";
+  final token = '?D(G+KbPeSgVkYp3s6v9y\$B&E)H@McQf';
 
   APIHelper() {
     dio.options = options;
+    dio.options.headers['apiToken'] = token;
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (HttpClient client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
   }
 
-  String uri = "http://192.168.8.100:5002/api/v1/employee/";
-
   BaseOptions options = BaseOptions(
-    baseUrl: "http://192.168.8.100:5002/api/v1/employee/",
+    baseUrl: "https://examination.24x7retail.com/api/v1.0/Employees",
     contentType: 'application/json',
   );
 
-  Future<dynamic> post(
-      EmployeeDataRequestModel employeeDataRequestModel) async {
+  Future<dynamic> post(EmployeeDataRequestModel employeeDataRequestModel) async {
     try {
       final response = await dio.post(
         uri,
@@ -32,8 +40,7 @@ class APIHelper {
     }
   }
 
-  Future<dynamic> put(
-      EmployeeDataRequestModel employeeDataRequestModel, String id) async {
+  Future<dynamic> put(EmployeeDataRequestModel employeeDataRequestModel, String id) async {
     try {
       final response = await dio.put(
         '$uri/$id',
